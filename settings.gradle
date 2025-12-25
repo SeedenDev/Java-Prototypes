@@ -1,0 +1,5 @@
+rootProject.name = 'Java-Prototypes'
+include 'Shortest-Path-Algorithms'
+include 'Cube-Renderer'
+include 'Compass'
+include 'Core'
