@@ -31,9 +31,9 @@ public class Application {
                     deltaTime = deltaTimeMillis / 1000;
                     lastTime = runTime;
 
-                    double fps = 1.0 / deltaTime;
-                    double renderMs = 1000.0 / fps;
-                    logger.debug("FPS:%f DT:%f MS:%f", fps, deltaTime, renderMs);
+//                    double fps = 1.0 / deltaTime;
+//                    double renderMs = 1000.0 / fps;
+//                    logger.debug("FPS:%f DT:%f MS:%f", fps, deltaTime, renderMs);
 
                     internalTick();
 

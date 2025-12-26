@@ -27,6 +27,10 @@ public class AppWindow {
     public void update(double deltaTime) {}
     public void render(Graphics g, double deltaTime) {}
 
+    public void refreshWindow(){
+        this.panel.refreshPanel();
+    }
+
     public void registerKeybinding(AppKeybinding keybinding){
         this.panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(getKeyStroke(keybinding,true), keybinding.getName()+"Press");
         this.panel.getActionMap().put(keybinding.getName()+"Press", new AbstractAction() {
@@ -43,6 +47,11 @@ public class AppWindow {
                 keybinding.setPressed(false);
             }
         });
+    }
+    public void registerKeybindings(AppKeybinding... keybindings){
+        for (AppKeybinding keybinding : keybindings) {
+            registerKeybinding(keybinding);
+        }
     }
 
     private KeyStroke getKeyStroke(AppKeybinding binding, boolean pressed){
@@ -61,12 +70,21 @@ public class AppWindow {
         this.windowWidth = width;
         this.windowHeight = height;
         this.frame.setSize(width, height);
-    }    /**
+    }
+    /**
      * Update the window size without resizing the window frame
      */
     public final void resizeWindow(int width, int height){
         this.windowWidth = width;
         this.windowHeight = height;
+    }
+
+    public final int getPanelWidth(){
+        return panel.getWidth();
+    }
+
+    public final int getPanelHeight(){
+        return panel.getHeight();
     }
 
     public final AppPanel getPanel() {

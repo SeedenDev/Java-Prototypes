@@ -2,6 +2,7 @@ package fr.seeden.core.window;
 
 import fr.seeden.core.event.EMouseButton;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public final class WindowUtil {
@@ -16,7 +17,16 @@ public final class WindowUtil {
         };
     }
 
-    //TODO: isAltKeyDown isMetaKeyDown isCtrlKeyDown isShiftKeyDown
+    public static void drawCircleWithLabel(Graphics g, Color color, int x, int y, int size, String txt){
+        drawCircle(g, color, x, y, size);
+        g.drawString(txt+"("+x+";"+y+")", x, y);
+    }
+
+    public static void drawCircle(Graphics g, Color color, int x, int y, int size){
+        g.setColor(color);
+        g.drawOval(x-size/2, y-size/2, size, size);
+        g.setColor(Color.BLACK);
+    }
 
     private WindowUtil(){}
 }

@@ -8,9 +8,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Compass" />
             <option value="$PROJECT_DIR$/Core" />
             <option value="$PROJECT_DIR$/Cube-Renderer" />
+            <option value="$PROJECT_DIR$/RpgCompassBarHud" />
             <option value="$PROJECT_DIR$/Shortest-Path-Algorithms" />
           </set>
         </option>

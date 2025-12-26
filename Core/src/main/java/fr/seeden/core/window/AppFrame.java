@@ -11,7 +11,7 @@ public final class AppFrame extends JFrame implements ComponentListener, FocusLi
 
     private final AppWindow window;
 
-    public AppFrame(String name, int width, int height, boolean resizable, AppPanel panel, AppWindow window){
+    AppFrame(String name, int width, int height, boolean resizable, AppPanel panel, AppWindow window){
         this.window = window;
 
         setTitle(name);
@@ -19,14 +19,14 @@ public final class AppFrame extends JFrame implements ComponentListener, FocusLi
         setSize(width, height);
         setResizable(resizable);
         setLocationRelativeTo(null);
-        setVisible(true);
         setContentPane(panel);
+        setVisible(true);
 
         addComponentListener(this);
         addFocusListener(this);
     }
 
-    public AppFrame(String name, boolean resizable, AppPanel panel, AppWindow window){
+    AppFrame(String name, boolean resizable, AppPanel panel, AppWindow window){
         this.window = window;
 
         setTitle(name);
