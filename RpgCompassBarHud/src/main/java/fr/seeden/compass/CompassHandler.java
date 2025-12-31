@@ -23,7 +23,7 @@ public class CompassHandler {
         if(playerPos==null || goalPos==null || playerLookAtVec ==null) return 0;
         Vector2 playerGoalVec = new Vector2(this.playerPos, this.goalPos);
         double scalar = this.playerLookAtVec.normalizeDot(playerGoalVec);
-        System.out.println(playerLookAtVec +"/"+playerGoalVec+"/"+ scalar +"\n--------------");
+//        System.out.println(playerLookAtVec +"/"+playerGoalVec+"/"+ scalar +"\n--------------");
 
         // Scalar=1 means both vectors are facing the same direction. This condition allows a very small margin to avoid unnecessary
         // operations if the direction vector is very close to facing the goal.
@@ -38,12 +38,13 @@ public class CompassHandler {
             // perfect middle between left and right, allowing the compass dot to be on the right side every moment
             double newAngle = Math.toDegrees(Math.acos(this.playerLookAtVec.rot(ANGLE_LIMIT).normalizeDot(playerGoalVec)));
             double v = this.playerLookAtVec.rot((double) -ANGLE_LIMIT/2).normalizeDot(playerGoalVec);
-            System.out.printf("\nRotated=%.2f ; S=%.2f\n", newAngle, v);
+//          System.out.printf("\nRotated=%.2f ; S=%.2f\n", newAngle, v);
+
             // If the rotated vector angle exceeds the limit, it means the original angle should be negative in order to
             // move the compass dot on the right side
             if (newAngle > ANGLE_LIMIT && v>=-0.9) degreeAngle *= -1;
             angle = Math.clamp(degreeAngle, MIN_ANGLE, MAX_ANGLE);
-            System.out.printf("\nRadiant=%.2f ; Degree=%.2f ; Clamped=%.2f", radianAngle, degreeAngle, angle);
+//            System.out.printf("\nRadiant=%.2f ; Degree=%.2f ; Clamped=%.2f", radianAngle, degreeAngle, angle);
         }
         /*
         Calculate the compass dot X position with the angle.
@@ -55,7 +56,7 @@ public class CompassHandler {
         So, 100/2 => +/-50, thus giving 0. Indeed, facing the goal means the dot being at the center of the bar.
         */
         double ratio = MathUtil.inverseLerp(MIN_ANGLE, MAX_ANGLE, angle);
-        System.out.printf("Angle=%.2f / min-max=%d~%d / t=%f \n", angle, MIN_ANGLE, MAX_ANGLE, ratio);
+//        System.out.printf("Angle=%.2f / min-max=%d~%d / t=%f \n", angle, MIN_ANGLE, MAX_ANGLE, ratio);
         return (int) MathUtil.lerp(-BAR_WIDTH/2, BAR_WIDTH/2, ratio);
     }
 

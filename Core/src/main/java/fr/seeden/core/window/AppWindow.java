@@ -6,6 +6,7 @@ import fr.seeden.core.Application;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 public class AppWindow {
 
@@ -26,10 +27,7 @@ public class AppWindow {
 
     public void update(double deltaTime) {}
     public void render(Graphics g, double deltaTime) {}
-
-    public void refreshWindow(){
-        this.panel.refreshPanel();
-    }
+    protected void onClose(){}
 
     public void registerKeybinding(AppKeybinding keybinding){
         this.panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(getKeyStroke(keybinding,true), keybinding.getName()+"Press");
@@ -55,7 +53,17 @@ public class AppWindow {
     }
 
     private KeyStroke getKeyStroke(AppKeybinding binding, boolean pressed){
-        return KeyStroke.getKeyStroke(binding.getKeyCode(), pressed ? binding.getModifiers() : 0, !pressed);
+        return KeyStroke.getKeyStroke(binding.getKeyCode(), pressed ? binding.getModifiersBitMask() : 0, !pressed);
+    }
+
+    public final void refreshWindow(){
+        this.panel.refreshPanel();
+    }
+
+    public final void close(){
+        this.frame.dispose();
+        this.mainApp.removeWindow(this);
+        onClose();
     }
 
     public final void renameWindow(String windowName) {

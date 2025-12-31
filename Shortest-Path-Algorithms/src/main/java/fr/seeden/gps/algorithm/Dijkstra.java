@@ -1,12 +1,13 @@
 package fr.seeden.gps.algorithm;
 
-import fr.seeden.gps.GpsDebug;
 import fr.seeden.gps.graph.Graph;
 import fr.seeden.gps.graph.Node;
 
 import java.util.*;
 
-public class Dijkstra extends IAlgorithm {
+public class Dijkstra extends Algorithm {
+
+    //TODO: maybe try to optimize Dijkstra
 
     private Node goal;
 
@@ -16,20 +17,16 @@ public class Dijkstra extends IAlgorithm {
 
     private List<Node> reconstructPath(HashMap<Node, Node> prev, Node current){
         ArrayList<Node> totalPath = new ArrayList<>(Collections.singletonList(current));
-        GpsDebug.debugRenderPanel();
         while(prev.containsKey(current)) {
-            GpsDebug.debugPanelDrawFinalLine(current, prev.get(current));
             current = prev.get(current);
             totalPath.addFirst(current);
         }
-        GpsDebug.debugPanelDrawStartAndEndPoint(current, goal);
         return totalPath;
     }
 
     @Override
-    public List<Node> process(Node start, Node goal) {
+    public List<Node> process(Node start, Node goal, VisitDebugCallback visitDebugCallback) {
         this.goal = goal;
-        GpsDebug.debugPanelDrawStartAndEndPoint(start, goal);
 
         List<Node> nodes = graph.getNodes();
         HashMap<Node, Integer> dist = new HashMap<>();
@@ -44,15 +41,17 @@ public class Dijkstra extends IAlgorithm {
             }
             Q.remove(current);
             for (Map.Entry<Node, Double> entry : current.getNeighbours().entrySet()) {
-                if(GpsDebug.isDebugEnabled()){
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
+//                if(GpsDebug.isDebugEnabled()){
+//                    try {
+//                        Thread.sleep(100);
+//                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
                 Node neighbour = entry.getKey();
-                GpsDebug.debugPanelDrawAlgorithmLine(current, neighbour);
+
+                visitDebugCallback.send(current, neighbour);
+
                 int alt = dist.get(current) + entry.getValue().intValue();
                 if(alt<dist.getOrDefault(neighbour, Integer.MAX_VALUE)){
                     dist.put(neighbour, alt);

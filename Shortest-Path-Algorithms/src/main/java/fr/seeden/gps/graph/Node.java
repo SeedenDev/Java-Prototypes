@@ -2,11 +2,12 @@ package fr.seeden.gps.graph;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Node {
 
     private final float x, y;
-    private final HashMap<Node, Double> neighbours = new HashMap<>();
+    private final ConcurrentHashMap<Node, Double> neighbours = new ConcurrentHashMap<>();
 
     public Node(float x, float y) {
         this.x = x;
@@ -41,7 +42,7 @@ public class Node {
         return y;
     }
 
-    public HashMap<Node, Double> getNeighbours() {
+    public ConcurrentHashMap<Node, Double> getNeighbours() {
         return neighbours;
     }
 

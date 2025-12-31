@@ -7,7 +7,7 @@ public class CompassApp extends Application {
 
     public CompassApp() {
         super("CompassApp");
-        getLogger().enable(true);
+        //getLogger().enable(true);
 
         CompassWindow compassWindow = new CompassWindow(this);
         addWindow(compassWindow);

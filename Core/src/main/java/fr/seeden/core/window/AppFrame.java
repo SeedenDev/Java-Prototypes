@@ -5,7 +5,7 @@ import fr.seeden.core.event.EventBus;
 import javax.swing.*;
 import java.awt.event.*;
 
-public final class AppFrame extends JFrame implements ComponentListener, FocusListener {
+public final class AppFrame extends JFrame implements ComponentListener, FocusListener, KeyListener {
 
     //Memo to get the screen size: Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -21,9 +21,18 @@ public final class AppFrame extends JFrame implements ComponentListener, FocusLi
         setLocationRelativeTo(null);
         setContentPane(panel);
         setVisible(true);
+        setFocusable(true);
+        requestFocusInWindow();
 
         addComponentListener(this);
         addFocusListener(this);
+        addKeyListener(this);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                window.close();
+            }
+        });
     }
 
     AppFrame(String name, boolean resizable, AppPanel panel, AppWindow window){
@@ -63,5 +72,26 @@ public final class AppFrame extends JFrame implements ComponentListener, FocusLi
     @Override
     public void focusLost(FocusEvent e) {
         EventBus.dispatchEvent(new fr.seeden.core.event.FocusEvent.FocusLostEvent(window, e.getComponent()));
+    }
+
+    // KeyListener, used only for the modifiers key as the Keybindings system is much better
+    @Override
+    public void keyTyped(KeyEvent e) {
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        AppKeybinding.Modifiers.setShiftPressed(e.isShiftDown());
+        AppKeybinding.Modifiers.setAltPressed(e.isAltDown());
+        AppKeybinding.Modifiers.setAltGraphPressed(e.isAltGraphDown());
+        AppKeybinding.Modifiers.setCtrlPressed(e.isControlDown());
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        AppKeybinding.Modifiers.setShiftPressed(e.isShiftDown());
+        AppKeybinding.Modifiers.setAltPressed(e.isAltDown());
+        AppKeybinding.Modifiers.setAltGraphPressed(e.isAltGraphDown());
+        AppKeybinding.Modifiers.setCtrlPressed(e.isControlDown());
     }
 }
