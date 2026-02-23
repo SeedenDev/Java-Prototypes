@@ -24,8 +24,11 @@ public class AppWindow {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
     }
+    public AppWindow(String windowName, boolean resizable, Application mainApp){
+        this(windowName, -1, -1, resizable, mainApp);
+    }
 
-    public void update(double deltaTime) {}
+        public void update(double deltaTime) {}
     public void render(Graphics g, double deltaTime) {}
     protected void onClose(){}
 

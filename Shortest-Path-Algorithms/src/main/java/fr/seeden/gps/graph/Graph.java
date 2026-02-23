@@ -1,8 +1,6 @@
 package fr.seeden.gps.graph;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Graph {
@@ -11,9 +9,10 @@ public class Graph {
 
     private final int sizeX, sizeY;
     private final CopyOnWriteArrayList<Node> nodes;
-    private final double averageDegree;
+    private double averageDegree, density;
     // Used for drawing graph only. Precomputed here to avoid losing time each time window refreshes.
     private final HashSet<Edge> edges;
+    private int nodeCount, edgeCount;
 
     public Graph(int sizeX, int sizeY, Node... nodes){
         this(sizeX, sizeY, new CopyOnWriteArrayList<>(nodes));
@@ -32,18 +31,40 @@ public class Graph {
             }
         }
         this.averageDegree = (double) totalNeighbours / nodes.size();
+        this.nodeCount = nodes.size();
+        this.edgeCount = edges.size();
+        this.density = edgeCount * 2.0 / (nodeCount * (nodeCount-1));
+    }
+
+    public void recomputeGraphInfo(){
+        this.edges.clear();
+        int totalNeighbours = 0;
+        for (Node node : nodes) {
+            totalNeighbours += node.getNeighbours().size();
+            for (Map.Entry<Node, Double> entry : node.getNeighbours().entrySet()) {
+                edges.add(new Edge(node, entry.getKey(), entry.getValue()));
+            }
+        }
+        this.averageDegree = (double) totalNeighbours / nodes.size();
+        this.nodeCount = nodes.size();
+        this.edgeCount = edges.size();
+        this.density = edgeCount * 2.0 / (nodeCount * (nodeCount-1));
     }
 
     public double getAverageDegree() {
         return averageDegree;
     }
 
-    public int getTotalEdges() {
-        return edges.size();
+    public int getEdgeCount() {
+        return edgeCount;
     }
 
-    public List<Node> getNodes() {
-        return nodes;
+    public int getNodeCount() {
+        return nodeCount;
+    }
+
+    public double getDensity() {
+        return density;
     }
 
     public int getSizeX() {
@@ -52,6 +73,10 @@ public class Graph {
 
     public int getSizeY() {
         return sizeY;
+    }
+
+    public List<Node> getNodes() {
+        return nodes;
     }
 
     public HashSet<Edge> getEdges() {

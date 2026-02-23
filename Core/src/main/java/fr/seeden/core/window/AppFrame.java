@@ -16,7 +16,8 @@ public final class AppFrame extends JFrame implements ComponentListener, FocusLi
 
         setTitle(name);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(width, height);
+        if(width<0 && height<0) setExtendedState(MAXIMIZED_BOTH);
+        else setSize(width, height);
         setResizable(resizable);
         setLocationRelativeTo(null);
         setContentPane(panel);
@@ -33,18 +34,6 @@ public final class AppFrame extends JFrame implements ComponentListener, FocusLi
                 window.close();
             }
         });
-    }
-
-    AppFrame(String name, boolean resizable, AppPanel panel, AppWindow window){
-        this.window = window;
-
-        setTitle(name);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setResizable(resizable);
-        setLocationRelativeTo(null);
-        setVisible(true);
-        setContentPane(panel);
     }
 
     // ComponentListener

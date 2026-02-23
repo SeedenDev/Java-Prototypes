@@ -11,22 +11,16 @@ import fr.seeden.core.window.WindowUtil;
 import fr.seeden.gps.algorithm.AStar;
 import fr.seeden.gps.algorithm.Algorithm;
 import fr.seeden.gps.algorithm.Dijkstra;
-import fr.seeden.gps.graph.Edge;
-import fr.seeden.gps.graph.Graph;
-import fr.seeden.gps.graph.GraphUtil;
-import fr.seeden.gps.graph.Node;
+import fr.seeden.gps.graph.*;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public class GpsTestWindow extends AppWindow implements EventListener {
-
-    //TODO: optimize the "find neighbours" code + add it to the API ("connectToNearbyNodes()" but not altering the true nodes list)
 
     enum DebugAlgorithm {
         ASTAR, DIJKSTRA;
@@ -53,15 +47,15 @@ public class GpsTestWindow extends AppWindow implements EventListener {
     private final HashSet<Edge> foundPathSet = new HashSet<>();
 
     private boolean placeStart = true;
-    private Node startNode, goalNode;
+    private GhostNode startNode, goalNode;
     private String resultText;
 
     private final boolean enableNodeDraw, enableEdgeDraw, enableNodeLabelDraw, enableEdgeWeightDraw, enableDebugEdgeDraw;
-    private final int nodeNb, minNeighbour, maxNeighbour;
+    private final int nodeCount, minNeighbour, maxNeighbour;
 
-    public GpsTestWindow(Application mainApp, int nodeNb, int minNeighbour, int maxNeighbour, boolean enableNodeDraw, boolean enableEdgeDraw, boolean enableNodeLabelDraw, boolean enableEdgeWeightDraw, boolean enableDebugEdgeDraw) {
-        super("Proto-GPS", 600, 600, true, mainApp);
-        this.nodeNb = nodeNb;
+    public GpsTestWindow(Application mainApp, int windowWidth, int windowHeight, int nodeCount, int minNeighbour, int maxNeighbour, boolean enableNodeDraw, boolean enableEdgeDraw, boolean enableNodeLabelDraw, boolean enableEdgeWeightDraw, boolean enableDebugEdgeDraw) {
+        super("Proto-GPS", windowWidth, windowHeight, true, mainApp);
+        this.nodeCount = nodeCount;
         this.minNeighbour = minNeighbour;
         this.maxNeighbour = maxNeighbour;
         this.enableNodeDraw = enableNodeDraw;
@@ -83,6 +77,7 @@ public class GpsTestWindow extends AppWindow implements EventListener {
         if(enableNodeDraw){
             List<Node> nodes = this.graph.getNodes();
             for (Node node : nodes) {
+                if(node instanceof GhostNode) continue;
                 int x = (int) node.getX();
                 int y = (int) node.getY();
                 if(enableNodeLabelDraw) WindowUtil.drawCircleWithLabel(g, Color.GREEN, x, y, 6, "");
@@ -129,10 +124,10 @@ public class GpsTestWindow extends AppWindow implements EventListener {
         if (event.getClickedButton().equals(EMouseButton.LEFT)) {
             if(resultText!=null) reset();
             if(placeStart) {
-                startNode = new Node(event.getMouseX(), event.getMouseY());
+                startNode = new GhostNode(event.getMouseX(), event.getMouseY());
                 goalNode = null;
             }
-            else goalNode = new Node(event.getMouseX(), event.getMouseY());
+            else goalNode = new GhostNode(event.getMouseX(), event.getMouseY());
             placeStart = !placeStart;
             refreshWindow();
         }
@@ -148,103 +143,46 @@ public class GpsTestWindow extends AppWindow implements EventListener {
                 visitedEdgeDebugSet.clear();
                 foundPathSet.clear();
             }
-            // Find neighbours to link with
-            final double MAX_NEIGHBOUR_DISTANCE = 70;
-            List<Node> distanceFrom = new ArrayList<>();
-            List<Node> distanceTo = new ArrayList<>();
-
+            // Launch path finding process
             List<Node> nodes = graph.getNodes();
-            for (Node node : nodes) {
-                double distFrom = node.getDistanceFrom(startNode);
-                double distTo = node.getDistanceFrom(goalNode);
-                if(distFrom<=MAX_NEIGHBOUR_DISTANCE) {
-                    if (distanceFrom.size() >= 5) {
-                        int furthestIndex = 0;
-                        double furthestDistance = 0;
-                        for (int i = 0; i < distanceFrom.size(); i++) {
-                            double d = distanceFrom.get(i).getDistanceFrom(startNode);
-                            if (d > furthestDistance) {
-                                furthestIndex = i;
-                                furthestDistance = d;
-                            }
-                        }
-                        if (distFrom < furthestDistance) {
-                            distanceFrom.remove(furthestIndex);
-                            distanceFrom.add(furthestIndex, node);
-                        }
-                    } else distanceFrom.add(node);
-                }
-                if(distTo<=MAX_NEIGHBOUR_DISTANCE) {
-                    if (distanceTo.size() >= 5) {
-                        int furthestIndex = 0;
-                        double furthestDistance = 0;
-                        for (int i = 0; i < distanceTo.size(); i++) {
-                            double d = distanceTo.get(i).getDistanceFrom(goalNode);
-                            if (d > furthestDistance) {
-                                furthestIndex = i;
-                                furthestDistance = d;
-                            }
-                        }
-                        if (distTo < furthestDistance) {
-                            distanceTo.remove(furthestIndex);
-                            distanceTo.add(furthestIndex, node);
-                        }
-                    } else distanceTo.add(node);
-                }
+            nodes.add(startNode);
+            nodes.add(goalNode);
+
+            refreshWindow();
+
+            Algorithm algorithm = null;
+            switch (debugAlgorithm) {
+                case ASTAR -> algorithm = new AStar(graph);
+                case DIJKSTRA -> algorithm = new Dijkstra(graph);
             }
-            distanceFrom.forEach(node -> {
-                startNode.addNeighbours(node);
-                node.addNeighbours(startNode);
-            });
-            distanceTo.forEach(node -> {
-                goalNode.addNeighbours(node);
-                node.addNeighbours(goalNode);
-            });
-            if(startNode.getNeighbours().isEmpty() || goalNode.getNeighbours().isEmpty()){
-                resultText = "Cannot proceed to path finding: start node or goal node is too far away from existing nodes.";
-            }else {
-                // Launch path finding process
-                nodes.add(startNode);
-                nodes.add(goalNode);
+            GpsService.setAlgorithm(algorithm);
 
-                refreshWindow();
+            resultText = "From "+startNode+" to "+goalNode;
+            processStarted = true;
+            long startTime = System.currentTimeMillis();
 
-                Algorithm algorithm = null;
-                switch (debugAlgorithm) {
-                    case ASTAR -> algorithm = new AStar(graph);
-                    case DIJKSTRA -> algorithm = new Dijkstra(graph);
-                }
-                GpsService.setAlgorithm(algorithm);
+            CompletableFuture<List<Node>> processFuture = GpsService.findPathBetweenNodes(startNode, goalNode,
+                    (node1, node2) -> {
+                        visitedEdgeDebugSet.add(new Edge(node1, node2, 0));
+                        refreshWindow();
+                    },
+                    (path) -> {
+                        long duration = System.currentTimeMillis() - startTime;
+                        resultText = "Process took " + duration + "ms";
+                        getLogger().debug("Path is: " + (path != null && !path.isEmpty() ? path : "not found."));
 
-                resultText = "From "+startNode+" to "+goalNode;
-                processStarted = true;
-                long startTime = System.currentTimeMillis();
+                        nodes.remove(startNode);
+                        nodes.remove(goalNode);
 
-                CompletableFuture<List<Node>> processFuture = GpsService.findPathBetweenNodes(startNode, goalNode,
-                        (node1, node2) -> {
-                            visitedEdgeDebugSet.add(new Edge(node1, node2, 0));
-                            refreshWindow();
-                        },
-                        (path) -> {
-                            long duration = System.currentTimeMillis() - startTime;
-                            resultText = "Process took " + duration + "ms";
-                            getLogger().debug("Path is: " + (path != null && !path.isEmpty() ? path : "not found."));
+                        if (path == null) return;
 
-                            distanceFrom.forEach(node -> node.removeNeighbours(startNode));
-                            distanceTo.forEach(node -> node.removeNeighbours(goalNode));
-                            nodes.remove(startNode);
-                            nodes.remove(goalNode);
+                        for (int i = 0; i < path.size() - 1; i++)
+                            foundPathSet.add(new Edge(path.get(i), path.get(i + 1), 0));
 
-                            if (path == null) return;
-
-                            for (int i = 0; i < path.size() - 1; i++)
-                                foundPathSet.add(new Edge(path.get(i), path.get(i + 1), 0));
-
-                            refreshWindow();
-                            processStarted = false;
-                        }
-                );
-            }
+                        refreshWindow();
+                        processStarted = false;
+                    }
+            );
         }
     }
 
@@ -265,8 +203,8 @@ public class GpsTestWindow extends AppWindow implements EventListener {
 
     private void generateGraph(){
         int graphSizeX = getPanelWidth()-10, graphSizeY = getPanelHeight()-30;
-        graph = GraphUtil.generateRandomGraph(graphSizeX, graphSizeY, nodeNb, minNeighbour, maxNeighbour);
-        renameWindow(String.format("Proto-GPS - Size: %dx%d / Nodes: %d (%d-%d min-max neighbours/node)", graphSizeX, graphSizeY, nodeNb, minNeighbour, maxNeighbour));
+        graph = GraphUtil.generateRandomGraph(graphSizeX, graphSizeY, nodeCount, minNeighbour, maxNeighbour);
+        renameWindow(String.format("Proto-GPS - Size: %dx%d / Nodes: %d (%d-%d min-max neighbours/node) / %d edges (Average degree: %f - Density: %f)", graphSizeX, graphSizeY, nodeCount, minNeighbour, maxNeighbour, graph.getEdgeCount(), graph.getAverageDegree(), graph.getDensity()));
         refreshWindow();
     }
 }

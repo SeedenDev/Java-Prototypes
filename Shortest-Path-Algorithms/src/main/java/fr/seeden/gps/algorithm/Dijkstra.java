@@ -1,5 +1,6 @@
 package fr.seeden.gps.algorithm;
 
+import fr.seeden.gps.graph.GhostNode;
 import fr.seeden.gps.graph.Graph;
 import fr.seeden.gps.graph.Node;
 
@@ -34,32 +35,35 @@ public class Dijkstra extends Algorithm {
         List<Node> Q = new ArrayList<>(nodes);
         dist.put(start, 0);
 
+        HashSet<Node> goalSet = new HashSet<>();
+        goalSet.add(goal);
+        if(goal instanceof GhostNode){
+            for (Map.Entry<Node, Double> entry : goal.getNeighbours().entrySet()) {
+                goalSet.add(entry.getKey());
+                //entry.getKey().addNeighbours(goal);
+            }
+        }
+
         while (!Q.isEmpty()) {
             Node current = getMinimumDistNode(Q, dist);
-            if(current==goal){
-                return reconstructPath(prev, current);
-            }
+
+            if (goalSet.contains(current)) return reconstructPath(prev, goal);
+
             Q.remove(current);
             for (Map.Entry<Node, Double> entry : current.getNeighbours().entrySet()) {
-//                if(GpsDebug.isDebugEnabled()){
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
                 Node neighbour = entry.getKey();
+                if(neighbour instanceof GhostNode) continue;
 
                 visitDebugCallback.send(current, neighbour);
 
-                int alt = dist.get(current) + entry.getValue().intValue();
+                int alt = dist.getOrDefault(current, 0) + entry.getValue().intValue();
                 if(alt<dist.getOrDefault(neighbour, Integer.MAX_VALUE)){
                     dist.put(neighbour, alt);
                     prev.put(neighbour, current);
                 }
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private Node getMinimumDistNode(List<Node> Q, HashMap<Node, Integer> dist){

@@ -100,7 +100,7 @@ public class RenderAppPanel extends JPanel implements MouseListener, MouseMotion
             double radians = Math.toRadians(offsetAngle);
             int x = (int) (Math.cos(radians)*scaleFactor+windowWidth/2);
             int y = (int) (Math.sin(radians)*scaleFactor+windowHeight/2);
-            double ratio = angle>180 ? MathUtil.inverseLerp(0, 180, 360-angle) : MathUtil.inverseLerp(0, 180, angle);
+            double ratio = angle>180 ? MathUtil.inverseLerp(0f, 180, 360-angle) : MathUtil.inverseLerp(0f, 180, angle);
             g.setColor(lerpColor(colorStart, colorEnd, ratio));
             g.fillRect(x-(pointSize/2), y-(pointSize/2), pointSize, pointSize);
         }

@@ -29,4 +29,8 @@ public abstract class Algorithm {
     public interface VisitDebugCallback {
         void send(Node node1, Node node2);
     }
+
+    public Graph getGraph() {
+        return graph;
+    }
 }

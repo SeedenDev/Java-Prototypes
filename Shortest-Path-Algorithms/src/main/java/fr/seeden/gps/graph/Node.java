@@ -1,6 +1,8 @@
 package fr.seeden.gps.graph;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,10 +16,13 @@ public class Node {
         this.y = y;
     }
 
-    public void addNeighbours(Node... nodes){
+    public void addNeighbours(List<Node> nodes){
         for (Node node : nodes) {
             this.neighbours.put(node, getDistanceFrom(node));
         }
+    }
+    public void addNeighbours(Node... nodes){
+        addNeighbours(Arrays.asList(nodes));
     }
 
     public void removeNeighbours(Node... nodes){

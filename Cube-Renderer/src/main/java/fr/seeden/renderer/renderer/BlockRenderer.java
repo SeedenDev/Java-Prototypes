@@ -3,6 +3,7 @@ package fr.seeden.renderer.renderer;
 import fr.seeden.core.math.Matrix;
 import fr.seeden.core.math.Vector2;
 import fr.seeden.core.math.Vector3;
+import fr.seeden.renderer.math.RMatrix;
 import fr.seeden.renderer.math.RendererMathUtil;
 import fr.seeden.renderer.math.SpecialMatrices;
 import fr.seeden.renderer.world.Block;
@@ -100,7 +101,7 @@ public class BlockRenderer {
         System.out.println("VertexPosition: "+vertexPosition);
 
         // Model matrix (model space to world space)
-        Matrix modelMatrix = new Matrix(new double[][]{
+        RMatrix modelMatrix = new RMatrix(new double[][]{
                 {blockScale.x, 0, 0, blockPos.x},
                 {0, blockScale.y, 0, blockPos.y}, // 0, blockScale.y, 1, blockPos.y
                 {0, 0, blockScale.z, blockPos.z}, // 0, -1
@@ -111,9 +112,9 @@ public class BlockRenderer {
         if(blockRot.y!=0) modelMatrix = modelMatrix.rotateY(blockRot.y);
         if(blockRot.z!=0) modelMatrix = modelMatrix.rotateZ(blockRot.z);*/
         //TEST CHATGPT
-        Matrix scaleMatrix = SpecialMatrices.SCALE_MATRIX.apply(blockScale);
-        Matrix rotationMatrix = SpecialMatrices.rotateXYZ(blockRot.x, blockRot.y, blockRot.z);
-        Matrix translationMatrix = SpecialMatrices.TRANSLATION_MATRIX.apply(blockPos);
+        RMatrix scaleMatrix = (RMatrix) SpecialMatrices.SCALE_MATRIX.apply(blockScale);
+        RMatrix rotationMatrix = SpecialMatrices.rotateXYZ(blockRot.x, blockRot.y, blockRot.z);
+        RMatrix translationMatrix = SpecialMatrices.TRANSLATION_MATRIX.apply(blockPos);
         modelMatrix = translationMatrix.translate(0.5, 0.5, 0.5) // Reverse offset
                 .multiply(rotationMatrix)
                 .translate(-0.5, -0.5, -0.5) // Offset for rotation to be centered
