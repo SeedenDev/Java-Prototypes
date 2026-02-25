@@ -35,13 +35,13 @@ public class CompassHandler {
             // Rotate the direction vector by the angle limit of the compass (before reaching the end of the bar)
             // And also in the non-clockwise order by half of the angle limit, that way we can also detect from which
             // side the player is the most turned to when being back to the goal, and thus having the delimiter at the
-            // perfect middle between left and right, allowing the compass dot to be on the right side every moment
+            // perfect middle between left and right, allowing the compass dot to be on the proper side
             double newAngle = Math.toDegrees(Math.acos(this.playerLookAtVec.rot(ANGLE_LIMIT).normalizeDot(playerGoalVec)));
             double v = this.playerLookAtVec.rot((double) -ANGLE_LIMIT/2).normalizeDot(playerGoalVec);
 //          System.out.printf("\nRotated=%.2f ; S=%.2f\n", newAngle, v);
 
             // If the rotated vector angle exceeds the limit, it means the original angle should be negative in order to
-            // move the compass dot on the right side
+            // move the compass dot on the proper side
             if (newAngle > ANGLE_LIMIT && v>=-0.9) degreeAngle *= -1;
             angle = Math.clamp(degreeAngle, MIN_ANGLE, MAX_ANGLE);
 //            System.out.printf("\nRadiant=%.2f ; Degree=%.2f ; Clamped=%.2f", radianAngle, degreeAngle, angle);
@@ -67,6 +67,7 @@ public class CompassHandler {
 
     public void setPlayerPos(Point2 playerPos) {
         this.playerPos = playerPos;
+        if(this.lootAtPos!=null) this.playerLookAtVec = new Vector2(this.playerPos, lootAtPos);
     }
     public void setGoalPos(Point2 goalPos) {
         this.goalPos = goalPos;
