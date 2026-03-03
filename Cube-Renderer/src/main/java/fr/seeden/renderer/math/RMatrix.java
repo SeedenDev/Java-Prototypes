@@ -11,6 +11,10 @@ public class RMatrix extends Matrix {
         super(data);
     }
 
+    public RMatrix multiply(RMatrix mat){
+        return (RMatrix) super.multiply(mat); //TODO: not that. Just don't have the time to implement the real method rn
+    }
+
     public RMatrix rotateX(double degree){
         return new RMatrix(multiply(SpecialMatrices.X_ROTATION_MATRIX.apply(degree)).getRawData());
     }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class Matrix {
 
     //TODO: clean this awful code and make a Matrix4x4 version
+    //TODO: REWRITE ALL
 
     private final double[][] data;
     public Matrix(double[][] data) {
@@ -33,7 +34,7 @@ public class Matrix {
         }
         return new Matrix(newData);
     }
-    private Matrix multiplyColumwnMajorPerhaps(Matrix matrix) {
+    private Matrix multiplyColumnMajorPerhaps(Matrix matrix) {
         if (data.length == 0 || matrix.data.length == 0) return null;
         if (data.length != matrix.data[0].length) return null;
 
