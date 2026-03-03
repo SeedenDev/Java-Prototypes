@@ -1,6 +1,5 @@
 package fr.seeden.gps;
 
-import fr.seeden.core.Application;
 import fr.seeden.core.event.EMouseButton;
 import fr.seeden.core.event.EventHandler;
 import fr.seeden.core.event.EventListener;
@@ -20,7 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-public class GpsTestWindow extends AppWindow implements EventListener {
+public class GpsTestWindow extends AppWindow<GpsTestApp> implements EventListener {
 
     enum DebugAlgorithm {
         ASTAR, DIJKSTRA;
@@ -53,7 +52,7 @@ public class GpsTestWindow extends AppWindow implements EventListener {
     private final boolean enableNodeDraw, enableEdgeDraw, enableNodeLabelDraw, enableEdgeWeightDraw, enableDebugEdgeDraw;
     private final int nodeCount, minNeighbour, maxNeighbour;
 
-    public GpsTestWindow(Application mainApp, int windowWidth, int windowHeight, int nodeCount, int minNeighbour, int maxNeighbour, boolean enableNodeDraw, boolean enableEdgeDraw, boolean enableNodeLabelDraw, boolean enableEdgeWeightDraw, boolean enableDebugEdgeDraw) {
+    public GpsTestWindow(GpsTestApp mainApp, int windowWidth, int windowHeight, int nodeCount, int minNeighbour, int maxNeighbour, boolean enableNodeDraw, boolean enableEdgeDraw, boolean enableNodeLabelDraw, boolean enableEdgeWeightDraw, boolean enableDebugEdgeDraw) {
         super("Proto-GPS", windowWidth, windowHeight, true, mainApp);
         this.nodeCount = nodeCount;
         this.minNeighbour = minNeighbour;
@@ -119,7 +118,7 @@ public class GpsTestWindow extends AppWindow implements EventListener {
     }
 
     @EventHandler
-    public void onMouseReleased(MouseEvent.MouseReleasedEvent event){
+    public void onMouseReleased(MouseEvent.MouseReleasedEvent<GpsTestWindow> event){
         if(processStarted) return;
         if (event.getClickedButton().equals(EMouseButton.LEFT)) {
             if(resultText!=null) reset();

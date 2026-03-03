@@ -1,16 +1,17 @@
 package fr.seeden.core.event;
 
+import fr.seeden.core.Application;
 import fr.seeden.core.window.AppWindow;
 
-public abstract class WindowEvent extends AppEvent {
+public abstract class WindowEvent<W extends AppWindow<? extends Application<?>>> extends AppEvent {
 
-    private final AppWindow window;
+    private final W window;
 
-    protected WindowEvent(AppWindow window) {
+    protected WindowEvent(W window) {
         this.window = window;
     }
 
-    public AppWindow getWindow() {
+    public W getWindow() {
         return window;
     }
 }

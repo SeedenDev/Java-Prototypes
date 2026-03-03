@@ -3,7 +3,7 @@ package fr.seeden.compass;
 import fr.seeden.core.Application;
 import fr.seeden.core.event.EventBus;
 
-public class CompassApp extends Application {
+public class CompassApp extends Application<CompassApp> {
 
     public CompassApp() {
         super("CompassApp");

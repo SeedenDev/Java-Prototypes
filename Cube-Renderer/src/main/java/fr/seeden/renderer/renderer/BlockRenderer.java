@@ -5,10 +5,8 @@ import fr.seeden.core.math.Vector2;
 import fr.seeden.core.math.Vector3;
 import fr.seeden.renderer.math.RMatrix;
 import fr.seeden.renderer.math.RendererMathUtil;
-import fr.seeden.renderer.math.SpecialMatrices;
 import fr.seeden.renderer.world.Block;
 import fr.seeden.renderer.world.Camera;
-import fr.seeden.renderer.world.Player;
 
 import java.awt.*;
 
@@ -46,7 +44,7 @@ public class BlockRenderer {
     float rotX = 0, rotY = 0, rotZ = 0;
 
     // Handle the rendering of a block.
-    public void render(Graphics g, Player player, Block block, Vector2 windowSize){
+    public void render(Graphics g, Camera camera, Block block, Vector2 windowSize){
         int face = -1; // Also for debug purpose only
         for (int tri = 0; tri < defaultIndexes.length-2; tri++) {
             if(tri%6==0) face++;
@@ -65,9 +63,9 @@ public class BlockRenderer {
             Vector3 v1 = getVertexFromIndex(i1);
             Vector3 v2 = getVertexFromIndex(i2);
             Vector3 v3 = getVertexFromIndex(i3);
-            Vector2 p1 = computeVertexPosition(g, v1, player, blockPos, blockRot, blockScale, windowSize);
-            Vector2 p2 = computeVertexPosition(g, v2, player, blockPos, blockRot, blockScale, windowSize);
-            Vector2 p3 = computeVertexPosition(g, v3, player, blockPos, blockRot, blockScale, windowSize);
+            Vector2 p1 = computeVertexPosition(g, v1, camera, blockPos, blockRot, blockScale, windowSize);
+            Vector2 p2 = computeVertexPosition(g, v2, camera, blockPos, blockRot, blockScale, windowSize);
+            Vector2 p3 = computeVertexPosition(g, v3, camera, blockPos, blockRot, blockScale, windowSize);
             if(p1==null||p2==null||p3==null) break;
             g.setColor(facesColor[face]);
             g.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
@@ -78,17 +76,16 @@ public class BlockRenderer {
         Vector3 blockPos = new Vector3(0,0,4);
         Vector3 blockRot = new Vector3(0, 0, 0);
         Vector3 blockScale = new Vector3(1, 1, 1);
-        Vector2 screenPos = computeVertexPosition(g, testPos, player, blockPos, blockRot, blockScale, windowSize);
+        Vector2 screenPos = computeVertexPosition(g, testPos, camera, blockPos, blockRot, blockScale, windowSize);
         g.drawOval((int) screenPos.x, (int) screenPos.y, 10, 10);
         System.out.println("Test Position: " + screenPos);
     }
 
     // Compute the 3D vertex position from the world space to the 2D coordinates on the screen space
-    private Vector2 computeVertexPosition(Graphics g, Vector3 vertexPos, final Player player, final Vector3 blockPos, final Vector3 blockRot, final Vector3 blockScale, final Vector2 windowSize){
+    private Vector2 computeVertexPosition(Graphics g, Vector3 vertexPos, final Camera camera, final Vector3 blockPos, final Vector3 blockRot, final Vector3 blockScale, final Vector2 windowSize){
         g.setColor(Color.BLACK);
         // Setting up important values for after
-        final Vector3 playerPos = new Vector3(player.x, player.y, player.z);
-        final Camera camera = player.camera;
+        final Vector3 playerPos = new Vector3(camera.getX(), camera.getY(), camera.getZ());
         final double yaw = camera.getYaw();
         final double pitch = camera.getPitch();
         final double fov = Math.toRadians(camera.getFov());
@@ -112,13 +109,12 @@ public class BlockRenderer {
         if(blockRot.y!=0) modelMatrix = modelMatrix.rotateY(blockRot.y);
         if(blockRot.z!=0) modelMatrix = modelMatrix.rotateZ(blockRot.z);*/
         //TEST CHATGPT
-        RMatrix scaleMatrix = (RMatrix) SpecialMatrices.SCALE_MATRIX.apply(blockScale);
-        RMatrix rotationMatrix = SpecialMatrices.rotateXYZ(blockRot.x, blockRot.y, blockRot.z);
-        RMatrix translationMatrix = SpecialMatrices.TRANSLATION_MATRIX.apply(blockPos);
-        modelMatrix = translationMatrix.translate(0.5, 0.5, 0.5) // Reverse offset
-                .multiply(rotationMatrix)
-                .translate(-0.5, -0.5, -0.5) // Offset for rotation to be centered
-                .multiply(scaleMatrix);
+        modelMatrix = modelMatrix
+                .translate(blockPos.x, blockPos.y, blockPos.z)
+                //.translate(0.5, 0.5, 0.5) // Reverse offset
+                .rotateXYZ(blockRot.x, blockRot.y, blockRot.z)
+                //.translate(-0.5, -0.5, -0.5) // Offset for rotation to be centered
+                .rescale(blockScale.x, blockScale.y, blockScale.z);
 
         System.out.println("ModelMatrix(Rot): "+modelMatrix);
         vertexPosition = modelMatrix.multiply(vertexPosition);

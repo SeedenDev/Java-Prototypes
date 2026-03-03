@@ -77,6 +77,10 @@ public class Matrix {
         return new Matrix(copy);
     }
 
+    public final double[][] getRawData() {
+        return data;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

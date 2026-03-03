@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class GpsTestApp extends Application {
+public class GpsTestApp extends Application<GpsTestApp> {
 
     private static final LaunchArgs.Arg<Boolean> USE_DEBUG_WINDOW =
             new LaunchArgs.Arg<>("useDebugWindow", false, true);

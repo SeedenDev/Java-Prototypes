@@ -1,14 +1,15 @@
 package fr.seeden.core.event;
 
+import fr.seeden.core.Application;
 import fr.seeden.core.window.AppWindow;
 
 import java.awt.*;
 
-public abstract class ComponentEvent extends WindowEvent {
+public abstract class ComponentEvent<W extends AppWindow<? extends Application<?>>> extends WindowEvent<W> {
 
     private final Component component;
 
-    protected ComponentEvent(AppWindow window, Component component) {
+    protected ComponentEvent(W window, Component component) {
         super(window);
         this.component = component;
     }
@@ -17,11 +18,11 @@ public abstract class ComponentEvent extends WindowEvent {
         return component;
     }
 
-    public static class ComponentResizedEvent extends ComponentEvent {
+    public static class ComponentResizedEvent<W extends AppWindow<? extends Application<?>>> extends ComponentEvent<W> {
 
         private final Dimension newSize;
 
-        public ComponentResizedEvent(AppWindow window, Component component) {
+        public ComponentResizedEvent(W window, Component component) {
             super(window, component);
             this.newSize = component.getSize();
         }
@@ -31,11 +32,11 @@ public abstract class ComponentEvent extends WindowEvent {
         }
     }
 
-    public static class ComponentMovedEvent extends ComponentEvent {
+    public static class ComponentMovedEvent<W extends AppWindow<? extends Application<?>>> extends ComponentEvent<W> {
 
         private final Point newPosition;
 
-        public ComponentMovedEvent(AppWindow window, Component component) {
+        public ComponentMovedEvent(W window, Component component) {
             super(window, component);
             this.newPosition = component.getLocation();
         }

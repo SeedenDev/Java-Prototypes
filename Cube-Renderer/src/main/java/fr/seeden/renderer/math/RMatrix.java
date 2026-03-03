@@ -5,34 +5,36 @@ import fr.seeden.core.math.Vector3;
 
 public class RMatrix extends Matrix {
 
+    //TODO: clean this shit
+
     public RMatrix(double[][] data) {
         super(data);
     }
 
-    public Matrix rotateX(double degree){
-        return multiply(SpecialMatrices.X_ROTATION_MATRIX.apply(degree));
+    public RMatrix rotateX(double degree){
+        return new RMatrix(multiply(SpecialMatrices.X_ROTATION_MATRIX.apply(degree)).getRawData());
     }
 
-    public Matrix rotateY(double degree){
-        return multiply(SpecialMatrices.Y_ROTATION_MATRIX.apply(degree));
+    public RMatrix rotateY(double degree){
+        return new RMatrix(multiply(SpecialMatrices.Y_ROTATION_MATRIX.apply(degree)).getRawData());
     }
 
-    public Matrix rotateZ(double degree){
-        return multiply(SpecialMatrices.Z_ROTATION_MATRIX.apply(degree));
+    public RMatrix rotateZ(double degree){
+        return new RMatrix(multiply(SpecialMatrices.Z_ROTATION_MATRIX.apply(degree)).getRawData());
     }
 
-    public Matrix translate(double x, double y, double z){
-        return multiply(SpecialMatrices.TRANSLATION_MATRIX.apply(new Vector3(x, y, z)));
+    public RMatrix translate(double x, double y, double z){
+        return new RMatrix(multiply(SpecialMatrices.TRANSLATION_MATRIX.apply(new Vector3(x, y, z))).getRawData());
     }
 
-    public Matrix rescale(double x, double y, double z){
-        return multiply(SpecialMatrices.SCALE_MATRIX.apply(new Vector3(x, y, z)));
+    public RMatrix rescale(double x, double y, double z){
+        return new RMatrix(multiply(SpecialMatrices.SCALE_MATRIX.apply(new Vector3(x, y, z))).getRawData());
     }
 
-    public Matrix rotateXYZ(double xRot, double yRot, double zRot) {
+    public RMatrix rotateXYZ(double xRot, double yRot, double zRot) {
         Matrix rotX = SpecialMatrices.X_ROTATION_MATRIX.apply(xRot);
         Matrix rotY = SpecialMatrices.Y_ROTATION_MATRIX.apply(yRot);
         Matrix rotZ = SpecialMatrices.Z_ROTATION_MATRIX.apply(zRot);
-        return rotZ.multiply(rotY).multiply(rotX); // ← classical order
+        return new RMatrix(rotZ.multiply(rotY).multiply(rotX).getRawData()); // ← classical order
     }
 }

@@ -13,12 +13,12 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
-public final class AppPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public final class AppPanel<A extends Application<A>> extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
 
-    private final Application mainApp;
-    private final AppWindow window;
+    private final A mainApp;
+    private final AppWindow<A> window;
 
-    AppPanel(Application mainApp, AppWindow window) {
+    AppPanel(A mainApp, AppWindow<A> window) {
         this.mainApp = mainApp;
         this.window = window;
         setLayout(new BorderLayout());

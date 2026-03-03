@@ -3,7 +3,9 @@ package fr.seeden.renderer;
 import fr.seeden.core.Application;
 import fr.seeden.core.event.EventBus;
 
-public class CubeRendererApp extends Application {
+public class CubeRendererApp extends Application<CubeRendererApp> {
+
+    private boolean paused = false;
 
     protected CubeRendererApp() {
         super("CubeRenderer");
@@ -12,6 +14,14 @@ public class CubeRendererApp extends Application {
         addWindow(cubeRendererWindow);
 
         EventBus.addEventListener(cubeRendererWindow);
+    }
+
+    public boolean isPaused() {
+        return paused;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
 
     public static void main(String[] args) {

@@ -107,7 +107,7 @@ public class Block {
             facesBuffer.add(faces);
         }
 
-        public void render(Graphics g, Player player, Point2 windowCenter){
+        public void render(Graphics g, Camera camera, Point2 windowCenter){
             for (Face[] faces : facesBuffer) {
                 boolean stopRenderingCurrentBlock = false;
                 //System.out.println("BLOCK");
@@ -125,9 +125,9 @@ public class Block {
                             stopRenderingCurrentBlock = true;
                             break;
                         }*/
-                        Point2 p1 = projectVertex(v1, player, windowCenter);
-                        Point2 p2 = projectVertex(v2, player, windowCenter);
-                        Point2 p3 = projectVertex(v3, player, windowCenter);
+                        Point2 p1 = projectVertex(v1, camera, windowCenter);
+                        Point2 p2 = projectVertex(v2, camera, windowCenter);
+                        Point2 p3 = projectVertex(v3, camera, windowCenter);
                         if(p1==null||p2==null||p3==null) break;
                         g.drawLine(p1.x, p1.y, p2.x, p2.y);
                         g.drawLine(p2.x, p2.y, p3.x, p3.y);
@@ -141,11 +141,10 @@ public class Block {
             g.drawLine(windowCenter.x, windowCenter.y, 1486, 363);
         }
 
-        private Point2 projectVertex(Vertex v, Player player, Point2 windowCenter){
+        private Point2 projectVertex(Vertex v, Camera camera, Point2 windowCenter){
             int width = windowCenter.x*2;
             int height = windowCenter.y*2;
             final Point3 vertexPos = new Point3(v.position[0], v.position[1], v.position[2]);
-            final Camera camera = player.camera;
             float yaw = camera.getYaw();
             float pitch = camera.getPitch();
             yaw = (float) Math.toRadians(yaw);
@@ -184,7 +183,7 @@ public class Block {
             // View Matrix
             Vector3 front = new Vector3(Math.cos(pitch)*Math.sin(yaw), Math.sin(pitch), Math.cos(pitch)*Math.cos(yaw)).normalize();
             //front = new Vector3(Math.cos(yaw)*Math.cos(pitch), Math.sin(pitch), Math.sin(yaw)*Math.cos(pitch)).normalize();
-            Vector3 position = new Vector3(player.x, player.y, player.z);
+            Vector3 position = new Vector3(camera.getX(), camera.getY(), camera.getZ());
             Vector3 target = position.add(front);
             Vector3 z = target.substract(position).normalize();
             Vector3 x = Vector3.UP.cross(z).normalize();//z.product(Vector3.UP).normalize();
@@ -274,11 +273,10 @@ public class Block {
             return new Point2(posX, posY);
         }
 
-        private Point2 getVertexScreenPositionFromCamView(Vertex v, Player player, Point2 windowCenter){
+        private Point2 getVertexScreenPositionFromCamView(Vertex v, Camera camera, Point2 windowCenter){
             int width = windowCenter.x*2;
             int height = windowCenter.y*2;
             final Point3 vertexPos = new Point3(v.position[0], v.position[1], v.position[2]);
-            Camera camera = player.camera;
             float yaw = camera.getYaw();
             float pitch = camera.getPitch();
             // Model to World ????? Pas compris mais jcrois pas besoin perso
@@ -299,7 +297,7 @@ public class Block {
              */
             Vector3 dir = new Vector3(Math.cos(pitch)*Math.sin(yaw), Math.sin(pitch), Math.cos(pitch)*Math.cos(yaw));
             final Vector3 UP = Vector3.UP.mult(-1).normalize();
-            final Vector3 F = new Vector3(player.x-dir.x, player.y-dir.y, player.z-dir.z).normalize();
+            final Vector3 F = new Vector3(camera.getX()-dir.x, camera.getY()-dir.y, camera.getZ()-dir.z).normalize();
             //final Vector3 F = new Vector3(dir.x-player.x, dir.y-player.y, dir.z-player.z).normalize();
             final Vector3 S = F.cross(UP).normalize();
             final Vector3 U = S.cross(F).normalize();
@@ -312,9 +310,9 @@ public class Block {
             });
             // MODEL MATRIX
             Matrix m2 = new Matrix(new double[][]{
-                    {1, 0, 0, -player.x},
-                    {0, 1, 0, -player.y},
-                    {0, 0, 1, -player.z},
+                    {1, 0, 0, -camera.getX()},
+                    {0, 1, 0, -camera.getY()},
+                    {0, 0, 1, -camera.getZ()},
                     {0, 0, 0, 1}
             });
             //region new code with proj matrix
@@ -366,19 +364,19 @@ public class Block {
             return new Point2(x, y);
         }
 
-        private boolean isPlayerFacing(Player player, Vertex vertex){
-            float yaw = player.camera.getYaw();
-            float pitch = player.camera.getPitch();
+        private boolean isPlayerFacing(Camera camera, Vertex vertex){
+            float yaw = camera.getYaw();
+            float pitch = camera.getPitch();
             Vector3 playerDirection = new Vector3(Math.cos(pitch)*Math.sin(yaw), Math.sin(pitch), Math.cos(pitch)*Math.cos(yaw));
 
-            Point3 playerPos = new Point3(player.x, player.y, player.z);
+            Point3 playerPos = new Point3(camera.getX(), camera.getY(), camera.getZ());
             Point3 vertexPos = new Point3(vertex.position[0], vertex.position[1], vertex.position[2]);
             Vector3 playerToVertex = new Vector3(playerPos, vertexPos);
 
             double scalar = playerDirection.normalizeDot(playerToVertex);
             double radianAngle = Math.acos(scalar);
             double degreeAngle = Math.toDegrees(radianAngle);
-            return degreeAngle < player.camera.getFov();
+            return degreeAngle < camera.getFov();
         }
 
         public void clearBuffer(){

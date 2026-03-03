@@ -6,25 +6,24 @@ import fr.seeden.core.Application;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Objects;
 
-public class AppWindow {
+public class AppWindow<A extends Application<A>> {
 
-    private final Application mainApp;
-    private final AppFrame frame;
-    private final AppPanel panel;
+    private final A mainApp;
+    private final AppFrame<A> frame;
+    private final AppPanel<A> panel;
     private String windowName;
     private int windowWidth, windowHeight;
 
-    public AppWindow(String windowName, int windowWidth, int windowHeight, boolean resizable, Application mainApp) {
+    public AppWindow(String windowName, int windowWidth, int windowHeight, boolean resizable, A mainApp) {
         this.mainApp = mainApp;
-        this.panel = new AppPanel(mainApp, this);
-        this.frame = new AppFrame(windowName, windowWidth, windowHeight, resizable, panel, this);
+        this.panel = new AppPanel<>(mainApp, this);
+        this.frame = new AppFrame<>(windowName, windowWidth, windowHeight, resizable, panel, this);
         this.windowName = windowName;
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
     }
-    public AppWindow(String windowName, boolean resizable, Application mainApp){
+    public AppWindow(String windowName, boolean resizable, A mainApp){
         this(windowName, -1, -1, resizable, mainApp);
     }
 
@@ -98,7 +97,7 @@ public class AppWindow {
         return panel.getHeight();
     }
 
-    public final AppPanel getPanel() {
+    public final AppPanel<A> getPanel() {
         return panel;
     }
 
@@ -116,5 +115,9 @@ public class AppWindow {
 
     public final AppLogger getLogger(){
         return mainApp.getLogger();
+    }
+
+    public A getApp() {
+        return mainApp;
     }
 }

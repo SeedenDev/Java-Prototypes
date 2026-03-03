@@ -1,17 +1,18 @@
 package fr.seeden.core.window;
 
+import fr.seeden.core.Application;
 import fr.seeden.core.event.EventBus;
 
 import javax.swing.*;
 import java.awt.event.*;
 
-public final class AppFrame extends JFrame implements ComponentListener, FocusListener, KeyListener {
+public final class AppFrame<A extends Application<A>> extends JFrame implements ComponentListener, FocusListener, KeyListener {
 
     //Memo to get the screen size: Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    private final AppWindow window;
+    private final AppWindow<A> window;
 
-    AppFrame(String name, int width, int height, boolean resizable, AppPanel panel, AppWindow window){
+    AppFrame(String name, int width, int height, boolean resizable, AppPanel<A> panel, AppWindow<A> window){
         this.window = window;
 
         setTitle(name);

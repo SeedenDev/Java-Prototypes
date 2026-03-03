@@ -10,7 +10,7 @@ import fr.seeden.core.window.WindowUtil;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
-public class CompassWindow extends AppWindow implements EventListener {
+public class CompassWindow extends AppWindow<CompassApp> implements EventListener {
 
     private static final short UP_BIT = 1;
     private static final short LEFT_BIT = 10;
@@ -131,7 +131,7 @@ public class CompassWindow extends AppWindow implements EventListener {
     }
 
     @EventHandler
-    public void onMouseReleased(MouseEvent.MouseReleasedEvent event){
+    public void onMouseReleased(MouseEvent.MouseReleasedEvent<CompassWindow> event){
         int x = event.getMouseX();
         int y = event.getMouseY();
         switch (event.getClickedButton()){
@@ -142,7 +142,7 @@ public class CompassWindow extends AppWindow implements EventListener {
     }
 
     @EventHandler
-    public void onMouseMoved(MouseEvent.MouseMovedEvent event){
+    public void onMouseMoved(MouseEvent.MouseMovedEvent<CompassWindow> event){
         if(event.isShiftPressed() && lookAtCooldown < System.currentTimeMillis()){
             lookAtCooldown = System.currentTimeMillis()+50;
             handler.setLootAt(new Point2(event.getMouseX(), event.getMouseY()));

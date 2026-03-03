@@ -8,17 +8,21 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Application {
+public class Application<A extends Application<A>> {
 
+    private final Application<A> instance;
     private final String appName;
     private final AppLogger logger;
     private final Thread appThread;
-    private final List<AppWindow> windowList = new ArrayList<>();
+    private final List<AppWindow<A>> windowList = new ArrayList<>();
     private int fpsLimit = 60;
     private double deltaTime;
     private boolean running = true;
+    protected double fps;
+    protected double renderTimeMs;
 
     protected Application(String appName) {
+        this.instance = this;
         this.appName = appName;
         logger = new AppLogger(appName);
         this.appThread = new Thread(new Runnable() {
@@ -33,8 +37,8 @@ public class Application {
                     deltaTime = deltaTimeMillis / 1000;
                     lastTime = runTime;
 
-//                    double fps = 1.0 / deltaTime;
-//                    double renderMs = 1000.0 / fps;
+                    instance.fps = 1.0 / deltaTime;
+                    instance.renderTimeMs = 1000.0 / fps;
 //                    logger.debug("FPS:%f DT:%f MS:%f", fps, deltaTime, renderMs);
 
                     internalTick();
@@ -47,7 +51,6 @@ public class Application {
                             Thread.currentThread().interrupt();
                         }
                     }
-
                 }
             }
         }, "AppRunThread");
@@ -60,14 +63,14 @@ public class Application {
     // either Toolkit.getDefaultToolkit().getSystemEventQueue() or custom queue
     private void internalTick(){
         tick(deltaTime);
-        for (AppWindow appWindow : this.windowList) {
+        for (AppWindow<A> appWindow : this.windowList) {
             appWindow.update(deltaTime);
         }
     }
     public void tick(double deltaTime){}
 
     public void dispatchRender(Graphics graphics){
-        for (AppWindow appWindow : this.windowList) {
+        for (AppWindow<A> appWindow : this.windowList) {
             appWindow.render(graphics, deltaTime);
         }
     }
@@ -75,17 +78,17 @@ public class Application {
     public void stop(){
         running = false;
         appThread.interrupt();
-        for (AppWindow appWindow : windowList) {
+        for (AppWindow<A> appWindow : windowList) {
             appWindow.close();
         }
         this.windowList.clear();
     }
 
-    public final void addWindow(AppWindow window){
+    public final void addWindow(AppWindow<A> window){
         windowList.add(window);
     }
 
-    public final void removeWindow(AppWindow window){
+    public final void removeWindow(AppWindow<A> window){
         windowList.remove(window);
     }
 
@@ -99,5 +102,13 @@ public class Application {
 
     public final AppLogger getLogger() {
         return logger;
+    }
+
+    public double getFps() {
+        return fps;
+    }
+
+    public double getRenderTimeMs() {
+        return renderTimeMs;
     }
 }
