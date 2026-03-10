@@ -5,7 +5,7 @@ import fr.seeden.core.math.Vector3;
 
 import java.util.function.Function;
 
-public final class SpecialMatrices {
+public final class TransformationMatrices {
 
     public static final Function<Double, Matrix> X_ROTATION_MATRIX = degree -> {
         double cos = RendererMathUtil.cosCheckZero(degree);

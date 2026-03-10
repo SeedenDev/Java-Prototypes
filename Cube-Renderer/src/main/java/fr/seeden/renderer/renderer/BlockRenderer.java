@@ -84,18 +84,17 @@ public class BlockRenderer {
     // V2376273823 tests
     private Vector2 computeVertexPosition(Graphics g, Vector3 vertexPos, final Camera camera, final Vector3 blockPos, final Vector3 blockRot, final Vector3 blockScale, final Vector2 windowSize){
         g.setColor(Color.BLACK);
-        // Setting up important values for after
         final Vector3 playerPos = new Vector3(camera.getX(), camera.getY(), camera.getZ());
         final double yaw = camera.getYaw();
         final double pitch = camera.getPitch();
         final double fov = Math.toRadians(camera.getFov());
         final int windowWidth = (int) windowSize.x;
         final int windowHeight = (int) windowSize.y;
+        //TODO: which?
         Matrix vertexPosition = new Matrix(new double[][]{
                 {vertexPos.x}, {vertexPos.y}, {vertexPos.z}, {1f}
                 //{ vertexPos.x, vertexPos.y, vertexPos.z, 1.0 }
         });
-        System.out.println("VertexPosition: "+vertexPosition);
 
         // Model matrix (model space to world space)
         RMatrix modelMatrix = new RMatrix(new double[][]{
@@ -110,6 +109,7 @@ public class BlockRenderer {
         if(blockRot.y!=0) modelMatrix = modelMatrix.rotateY(blockRot.y);
         if(blockRot.z!=0) modelMatrix = modelMatrix.rotateZ(blockRot.z);*/
 
+        //TODO: just check what is glm doing
         RMatrix viewMatrix = new RMatrix(new double[][]{
                 {0, 0, 0, 0},
                 {0, 0, 0, 0},
@@ -131,94 +131,9 @@ public class BlockRenderer {
 
         RMatrix finalMatrix = modelMatrix.multiply(viewMatrix).multiply(perspectiveMatrix);
 
-
-
-
-
-
-
-        //TEST CHATGPT
-        modelMatrix = modelMatrix
-                .translate(blockPos.x, blockPos.y, blockPos.z)
-                //.translate(0.5, 0.5, 0.5) // Reverse offset
-                .rotateXYZ(blockRot.x, blockRot.y, blockRot.z)
-                //.translate(-0.5, -0.5, -0.5) // Offset for rotation to be centered
-                .rescale(blockScale.x, blockScale.y, blockScale.z);
-
-        System.out.println("ModelMatrix(Rot): "+modelMatrix);
-        vertexPosition = modelMatrix.multiply(vertexPosition);
-        System.out.println("VertexPosition(MM): "+vertexPosition);
-
-        // View matrix (world space to view space (=camera view/space))
-        Vector3 xaxis = new Vector3( -RendererMathUtil.cosCheckZero(yaw), 0, -RendererMathUtil.sinCheckZero(yaw));
-        Vector3 yaxis = new Vector3(RendererMathUtil.sinCheckZero(yaw)*RendererMathUtil.sinCheckZero(pitch), RendererMathUtil.cosCheckZero(pitch), RendererMathUtil.cosCheckZero(yaw)*RendererMathUtil.sinCheckZero(pitch));
-        Vector3 zaxis = new Vector3(RendererMathUtil.sinCheckZero(yaw)*RendererMathUtil.cosCheckZero(pitch), -RendererMathUtil.sinCheckZero(pitch), RendererMathUtil.cosCheckZero(pitch)*RendererMathUtil.cosCheckZero(yaw));
-
-        Matrix viewMatrix = new Matrix(new double[][]{
-                {xaxis.x, yaxis.x, zaxis.x, 0},
-                {xaxis.y, yaxis.y, zaxis.y, 0},
-                {xaxis.z, yaxis.z, zaxis.z, 0},
-                {-xaxis.dot(playerPos), -yaxis.dot(playerPos), -zaxis.dot(playerPos), 1}
-        });
-        // TEST NEW VIEW MATRIX (chatgpt)
-        Vector3 forward = new Vector3(
-                Math.cos(pitch) * Math.sin(yaw),
-                -Math.sin(pitch),
-                Math.cos(pitch) * Math.cos(yaw)
-        ).normalize();
-        Vector3 right = Vector3.UP.cross(forward).normalize(); // X-axis
-        Vector3 up = forward.cross(right).normalize(); // Y-axis
-        g.drawString(String.format("FORWARD: %s", forward), 10, 300);
-        g.drawString(String.format("RIGHT: %s", right), 10, 320);
-        g.drawString(String.format("UP: %s", up), 10, 340);
-        viewMatrix = new Matrix(new double[][] {
-                {right.x, up.x, -forward.x, 0},
-                {right.y, up.y, -forward.y, 0},
-                {right.z, up.z, -forward.z, 0},
-                {-right.dot(playerPos), -up.dot(playerPos), forward.dot(playerPos), 1} // pas de -
-        });
-
-        System.out.println("ViewMatrix: "+viewMatrix);
-        //vertexPosition = viewMatrix.multiply(vertexPosition);
-        System.out.println("VertexPosition(VM): "+vertexPosition);
-        //vertexPosition = vertexPosition.translate(-player.x, -player.y, -player.z);
-
-        // Projection matrix (view space to projection space)
-        final float aspect = (float) windowWidth/windowHeight;//windowHeight/windowWidth;
-        final float f = (float) (1f/Math.tan(fov/2));
-        final float near = 0.1f;
-        final float far = 1000f;
-        float q = far/(far-near);
-        float qn = (far * near) / (far - near);
-        Matrix projectionMatrix = new Matrix(new double[][]{
-                {aspect*f, 0, 0, 0},
-                {0, f, 0, 0},
-                {0, 0, -q, -1},
-                {0, 0, qn, 0}
-        });
-        /*projectionMatrix = new Matrix(new double[][]{ // ROW MAJOR
-                {f / aspect, 0, 0, 0},
-                {0, f, 0, 0},
-                {0, 0, (far + near) / (near - far), -1},
-                {0, 0, (2 * far * near) / (near - far), 0}
-        });*/
-        projectionMatrix = new Matrix(new double[][]{
-                {f / aspect, 0, 0, 0},
-                {0, f, 0, 0},
-                {0, 0, (far + near) / (near - far), (2 * far * near) / (near - far)},
-                {0, 0, -1, 0}
-        });
-
-        Matrix finalMatrix = projectionMatrix.multiply(viewMatrix);//.multiply(modelMatrix);
-        g.drawString(String.format("Model %s", modelMatrix), 10, 200);
-        g.drawString(String.format("View %s", viewMatrix), 10, 220);
-        g.drawString(String.format("Proj %s", projectionMatrix), 10, 240);
-        g.drawString(String.format("Final %s", finalMatrix), 10, 260);
-
-        System.out.println("PVM: "+finalMatrix);
         vertexPosition = finalMatrix.multiply(vertexPosition);
-        g.drawString(String.format("After %s", vertexPosition), 10, 280);
 
+        //TODO: recheck everything here
         // Last step, projection space to screen space (finally, 3D to 2D using z as the depth)
         double xx = vertexPosition.get(0, 0);
         double yy = vertexPosition.get(1, 0);
@@ -236,16 +151,10 @@ public class BlockRenderer {
         final Vector3 pos = new Vector3(xx, yy, zz);
         System.out.println("VertexPosition(final): "+pos);
         //if (pos.x < -1 || pos.x > 1 || pos.y < -1 || pos.y > 1) return null;
-        /*
-        x = (x / width) * bounds.GetWidth() - bounds.GetWidth() * 0.5f;
-		y = bounds.GetHeight() * 0.5f - (y / height) * bounds.GetHeight();
-         */
         int posX = (int) (pos.x*(windowWidth/2)/pos.z+(windowWidth/2));
         int posY = (int) (pos.y*(windowHeight/2)/pos.z+(windowHeight/2));
-        //BEELOW==chatgpt
         posX = (int)((pos.x + 1) * windowWidth / 2.0);
-        posY = (int)((1 - pos.y) * windowHeight / 2.0); // Y inversé
-        System.out.println("Pos: "+posX+"/"+posY+"\n---------------");
+        posY = (int)((1 - pos.y) * windowHeight / 2.0); // Reversed Y
         return new Vector2(posX, posY);
     }
 

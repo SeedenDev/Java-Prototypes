@@ -16,29 +16,29 @@ public class RMatrix extends Matrix {
     }
 
     public RMatrix rotateX(double degree){
-        return new RMatrix(multiply(SpecialMatrices.X_ROTATION_MATRIX.apply(degree)).getRawData());
+        return new RMatrix(multiply(TransformationMatrices.X_ROTATION_MATRIX.apply(degree)).getRawData());
     }
 
     public RMatrix rotateY(double degree){
-        return new RMatrix(multiply(SpecialMatrices.Y_ROTATION_MATRIX.apply(degree)).getRawData());
+        return new RMatrix(multiply(TransformationMatrices.Y_ROTATION_MATRIX.apply(degree)).getRawData());
     }
 
     public RMatrix rotateZ(double degree){
-        return new RMatrix(multiply(SpecialMatrices.Z_ROTATION_MATRIX.apply(degree)).getRawData());
+        return new RMatrix(multiply(TransformationMatrices.Z_ROTATION_MATRIX.apply(degree)).getRawData());
     }
 
     public RMatrix translate(double x, double y, double z){
-        return new RMatrix(multiply(SpecialMatrices.TRANSLATION_MATRIX.apply(new Vector3(x, y, z))).getRawData());
+        return new RMatrix(multiply(TransformationMatrices.TRANSLATION_MATRIX.apply(new Vector3(x, y, z))).getRawData());
     }
 
     public RMatrix rescale(double x, double y, double z){
-        return new RMatrix(multiply(SpecialMatrices.SCALE_MATRIX.apply(new Vector3(x, y, z))).getRawData());
+        return new RMatrix(multiply(TransformationMatrices.SCALE_MATRIX.apply(new Vector3(x, y, z))).getRawData());
     }
 
     public RMatrix rotateXYZ(double xRot, double yRot, double zRot) {
-        Matrix rotX = SpecialMatrices.X_ROTATION_MATRIX.apply(xRot);
-        Matrix rotY = SpecialMatrices.Y_ROTATION_MATRIX.apply(yRot);
-        Matrix rotZ = SpecialMatrices.Z_ROTATION_MATRIX.apply(zRot);
+        Matrix rotX = TransformationMatrices.X_ROTATION_MATRIX.apply(xRot);
+        Matrix rotY = TransformationMatrices.Y_ROTATION_MATRIX.apply(yRot);
+        Matrix rotZ = TransformationMatrices.Z_ROTATION_MATRIX.apply(zRot);
         return new RMatrix(rotZ.multiply(rotY).multiply(rotX).getRawData()); // ← classical order
     }
 }

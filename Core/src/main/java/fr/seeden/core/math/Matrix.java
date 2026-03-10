@@ -13,9 +13,9 @@ public class Matrix {
     }
 
     public Matrix multiply(Matrix matrix){
-        return multiplyRowMajorPerhaps(matrix);
+        return multiplyColumnMajor(matrix);
     }
-    private Matrix multiplyRowMajorPerhaps(Matrix matrix){
+    private Matrix multiplyRowMajor(Matrix matrix){
         if(data.length==0 || matrix.data.length==0) return null;
         if(data[0].length!=matrix.data.length) return null;
         int n = data[0].length; // nombre de colonnes de la première matrice, et de lignes de la seconde
@@ -34,7 +34,7 @@ public class Matrix {
         }
         return new Matrix(newData);
     }
-    private Matrix multiplyColumnMajorPerhaps(Matrix matrix) {
+    private Matrix multiplyColumnMajor(Matrix matrix) {
         if (data.length == 0 || matrix.data.length == 0) return null;
         if (data.length != matrix.data[0].length) return null;
 
@@ -57,7 +57,7 @@ public class Matrix {
     }
 
     public double get(int line, int column){
-        return getRowMajor(line, column);
+        return getColumnMajor(line, column);
     }
     private double getRowMajor(int line, int column){
         return this.data[line][column];
